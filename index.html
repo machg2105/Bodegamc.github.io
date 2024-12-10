@@ -61,6 +61,8 @@
 
         <h2>Billetes y Monedas Disponibles</h2>
         <div>
+            <label>Billetes de $20: <input type="number" id="billetes20" min="0" onchange="actualizarMonedas()"></label>
+            <label>Billetes de $10: <input type="number" id="billetes10" min="0" onchange="actualizarMonedas()"></label>
             <label>Billetes de $5: <input type="number" id="billetes5" min="0" onchange="actualizarMonedas()"></label>
             <label>Monedas de $1: <input type="number" id="monedas1" min="0" onchange="actualizarMonedas()"></label>
             <label>Monedas de 50¢: <input type="number" id="monedas50" min="0" onchange="actualizarMonedas()"></label>
@@ -89,16 +91,20 @@
         // Inicializar o cargar el estado de la caja
         function inicializarCaja() {
             const estadoCaja = JSON.parse(localStorage.getItem('estadoCaja')) || {
-                billetes5: 0,   // Valores por defecto
-                monedas1: 0,
-                monedas50: 0,
-                monedas25: 0,
-                monedas10: 0,
-                monedas5: 0,
-                monedas1c: 0
+                billetes20: 30,   // Valores por defecto
+                billetes10: 50,
+                billetes5: 50,
+                monedas1: 100,
+                monedas50: 100,
+                monedas25: 100,
+                monedas10: 100,
+                monedas5: 100,
+                monedas1c: 200
             };
 
             // Establecer valores en los inputs
+            document.getElementById('billetes20').value = estadoCaja.billetes20;
+            document.getElementById('billetes10').value = estadoCaja.billetes10;
             document.getElementById('billetes5').value = estadoCaja.billetes5;
             document.getElementById('monedas1').value = estadoCaja.monedas1;
             document.getElementById('monedas50').value = estadoCaja.monedas50;
@@ -113,6 +119,8 @@
         // Actualizar el total de monedas
         function actualizarMonedas() {
             const denominaciones = [
+                {valor: 20, nombre: 'Billetes de $20', tipo: 'billetes20'},
+                {valor: 10, nombre: 'Billetes de $10', tipo: 'billetes10'},
                 {valor: 5, nombre: 'Billetes de $5', tipo: 'billetes5'},
                 {valor: 1, nombre: 'Monedas de $1', tipo: 'monedas1'},
                 {valor: 0.50, nombre: 'Monedas de 50¢', tipo: 'monedas50'},
@@ -123,6 +131,8 @@
             ];
 
             const estadoCaja = {
+                billetes20: parseInt(document.getElementById('billetes20').value),
+                billetes10: parseInt(document.getElementById('billetes10').value),
                 billetes5: parseInt(document.getElementById('billetes5').value),
                 monedas1: parseInt(document.getElementById('monedas1').value),
                 monedas50: parseInt(document.getElementById('monedas50').value),
@@ -168,6 +178,8 @@
         function calcularCambio() {
             // Obtener valores disponibles
             const disponibles = {
+                billetes20: parseInt(document.getElementById('billetes20').value),
+                billetes10: parseInt(document.getElementById('billetes10').value),
                 billetes5: parseInt(document.getElementById('billetes5').value),
                 monedas1: parseInt(document.getElementById('monedas1').value),
                 monedas50: parseInt(document.getElementById('monedas50').value),
@@ -196,6 +208,8 @@
 
             // Algoritmo de cálculo de cambio
             const denominaciones = [
+                {valor: 20, nombre: 'Billetes de $20', tipo: 'billetes20'},
+                {valor: 10, nombre: 'Billetes de $10', tipo: 'billetes10'},
                 {valor: 5, nombre: 'Billetes de $5', tipo: 'billetes5'},
                 {valor: 1, nombre: 'Monedas de $1', tipo: 'monedas1'},
                 {valor: 0.50, nombre: 'Monedas de 50¢', tipo: 'monedas50'},
@@ -250,4 +264,4 @@
         window.onload = inicializarCaja;
     </script>
 </body>
-  </html>
+</html>
