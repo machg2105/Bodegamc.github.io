@@ -1,1 +1,253 @@
-<!DOCTYPE html><br/><html lang="en"><br/><head><br/><meta charset="UTF-8"><br/><meta name="viewport" content="width=device-width, initial-scale=1.0"><br/><link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css"><br/><link rel="stylesheet" href="styles.css"><br/><title>Reproductor de Video</title><br/></head><br/><body><br/><div class="container"><br/>    <div class="controls"><br/>        <input type="text" id="videoUrl" placeholder="Introduce la URL del video"><br/>        <button class="btn btn-primary" onclick="reproducirVideo()">Iniciar</button><br/>        <button class="btn btn-primary" onclick="limpiarUrl()">Limpiar</button><br/>    </div><br/>    <div class="video-container"><br/>        <video id="player" controls playsinline><br/>            <source src="" type="video/mp4"><br/>        </video><br/>    </div><br/></div><br/><script src="https://cdn.plyr.io/3.6.4/plyr.js"></script><br/><script src="script.js"></script><br/></body><br/></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora de Cambio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+        }
+        #resultados, #totalMonedas {
+            margin-top: 20px;
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .total-cambio {
+            font-weight: bold;
+            color: green;
+            margin-top: 10px;
+        }
+        .total-monedas {
+            font-weight: bold;
+            color: blue;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de Cambio</h1>
+        
+        <div id="totalMonedas" class="total-monedas">
+            Total de Monedas en Caja
+            <!-- Aquí se mostrarán los totales de monedas -->
+        </div>
+
+        <h2>Billetes y Monedas Disponibles</h2>
+        <div>
+            <label>Billetes de $5: <input type="number" id="billetes5" min="0" onchange="actualizarMonedas()"></label>
+            <label>Monedas de $1: <input type="number" id="monedas1" min="0" onchange="actualizarMonedas()"></label>
+            <label>Monedas de 50¢: <input type="number" id="monedas50" min="0" onchange="actualizarMonedas()"></label>
+            <label>Monedas de 25¢: <input type="number" id="monedas25" min="0" onchange="actualizarMonedas()"></label>
+            <label>Monedas de 10¢: <input type="number" id="monedas10" min="0" onchange="actualizarMonedas()"></label>
+            <label>Monedas de 5¢: <input type="number" id="monedas5" min="0" onchange="actualizarMonedas()"></label>
+            <label>Monedas de 1¢: <input type="number" id="monedas1c" min="0" onchange="actualizarMonedas()"></label>
+        </div>
+
+        <h2>Cálculo de Cambio</h2>
+        <div>
+            <label>Total de la Factura: 
+                <input type="number" id="totalFactura" min="0" step="0.01" placeholder="Ingrese el total">
+            </label>
+            <label>Dinero Recibido: 
+                <input type="number" id="dineroRecibido" min="0" step="0.01" placeholder="Ingrese dinero recibido">
+            </label>
+            <button onclick="calcularCambio()">Calcular Cambio</button>
+            <button onclick="reiniciarCaja()">Reiniciar Caja</button>
+        </div>
+
+        <div id="resultados"></div>
+    </div>
+
+    <script>
+        // Inicializar o cargar el estado de la caja
+        function inicializarCaja() {
+            const estadoCaja = JSON.parse(localStorage.getItem('estadoCaja')) || {
+                billetes5: 0,   // Valores por defecto
+                monedas1: 0,
+                monedas50: 0,
+                monedas25: 0,
+                monedas10: 0,
+                monedas5: 0,
+                monedas1c: 0
+            };
+
+            // Establecer valores en los inputs
+            document.getElementById('billetes5').value = estadoCaja.billetes5;
+            document.getElementById('monedas1').value = estadoCaja.monedas1;
+            document.getElementById('monedas50').value = estadoCaja.monedas50;
+            document.getElementById('monedas25').value = estadoCaja.monedas25;
+            document.getElementById('monedas10').value = estadoCaja.monedas10;
+            document.getElementById('monedas5').value = estadoCaja.monedas5;
+            document.getElementById('monedas1c').value = estadoCaja.monedas1c;
+
+            actualizarMonedas();
+        }
+
+        // Actualizar el total de monedas
+        function actualizarMonedas() {
+            const denominaciones = [
+                {valor: 5, nombre: 'Billetes de $5', tipo: 'billetes5'},
+                {valor: 1, nombre: 'Monedas de $1', tipo: 'monedas1'},
+                {valor: 0.50, nombre: 'Monedas de 50¢', tipo: 'monedas50'},
+                {valor: 0.25, nombre: 'Monedas de 25¢', tipo: 'monedas25'},
+                {valor: 0.10, nombre: 'Monedas de 10¢', tipo: 'monedas10'},
+                {valor: 0.05, nombre: 'Monedas de 5¢', tipo: 'monedas5'},
+                {valor: 0.01, nombre: 'Monedas de 1¢', tipo: 'monedas1c'}
+            ];
+
+            const estadoCaja = {
+                billetes5: parseInt(document.getElementById('billetes5').value),
+                monedas1: parseInt(document.getElementById('monedas1').value),
+                monedas50: parseInt(document.getElementById('monedas50').value),
+                monedas25: parseInt(document.getElementById('monedas25').value),
+                monedas10: parseInt(document.getElementById('monedas10').value),
+                monedas5: parseInt(document.getElementById('monedas5').value),
+                monedas1c: parseInt(document.getElementById('monedas1c').value)
+            };
+
+            // Guardar en localStorage
+            localStorage.setItem('estadoCaja', JSON.stringify(estadoCaja));
+
+            // Calcular total en efectivo
+            let totalEfectivo = 0;
+            denominaciones.forEach(denom => {
+                const cantidad = estadoCaja[denom.tipo];
+                totalEfectivo += cantidad * denom.valor;
+            });
+
+            // Mostrar total de monedas
+            const totalMonedasDiv = document.getElementById('totalMonedas');
+            let detalleMonedas = "<h3>Desglose de Monedas en Caja:</h3>";
+            denominaciones.forEach(denom => {
+                const cantidad = estadoCaja[denom.tipo];
+                const valorTotal = (cantidad * denom.valor).toFixed(2);
+                detalleMonedas += `${denom.nombre}: ${cantidad} (${valorTotal} $)<br>`;
+            });
+            detalleMonedas += `<div class="total-monedas">Total en Caja: $${totalEfectivo.toFixed(2)}</div>`;
+            
+            totalMonedasDiv.innerHTML = detalleMonedas;
+        }
+
+        // Reiniciar el estado de la caja
+        function reiniciarCaja() {
+            const confirmacion = confirm("¿Estás seguro de que deseas reiniciar la caja? Esto restablecerá todas las monedas a los valores por defecto.");
+            
+            if (confirmacion) {
+                localStorage.removeItem('estadoCaja');
+                inicializarCaja();
+            }
+        }
+
+        function calcularCambio() {
+            // Obtener valores disponibles
+            const disponibles = {
+                billetes5: parseInt(document.getElementById('billetes5').value),
+                monedas1: parseInt(document.getElementById('monedas1').value),
+                monedas50: parseInt(document.getElementById('monedas50').value),
+                monedas25: parseInt(document.getElementById('monedas25').value),
+                monedas10: parseInt(document.getElementById('monedas10').value),
+                monedas5: parseInt(document.getElementById('monedas5').value),
+                monedas1c: parseInt(document.getElementById('monedas1c').value)
+            };
+
+            const totalFactura = parseFloat(document.getElementById('totalFactura').value);
+            const dineroRecibido = parseFloat(document.getElementById('dineroRecibido').value);
+            const resultadosDiv = document.getElementById('resultados');
+
+            // Validaciones
+            if (isNaN(totalFactura) || isNaN(dineroRecibido)) {
+                resultadosDiv.innerHTML = "Por favor, ingrese valores válidos";
+                return;
+            }
+
+            const cambio = dineroRecibido - totalFactura;
+
+            if (cambio < 0) {
+                resultadosDiv.innerHTML = "El dinero recibido es insuficiente";
+                return;
+            }
+
+            // Algoritmo de cálculo de cambio
+            const denominaciones = [
+                {valor: 5, nombre: 'Billetes de $5', tipo: 'billetes5'},
+                {valor: 1, nombre: 'Monedas de $1', tipo: 'monedas1'},
+                {valor: 0.50, nombre: 'Monedas de 50¢', tipo: 'monedas50'},
+                {valor: 0.25, nombre: 'Monedas de 25¢', tipo: 'monedas25'},
+                {valor: 0.10, nombre: 'Monedas de 10¢', tipo: 'monedas10'},
+                {valor: 0.05, nombre: 'Monedas de 5¢', tipo: 'monedas5'},
+                {valor: 0.01, nombre: 'Monedas de 1¢', tipo: 'monedas1c'}
+            ];
+
+            const cambioDetallado = {};
+            let cambioRestante = cambio.toFixed(2);
+            let totalEntregado = 0;
+
+            for (let moneda of denominaciones) {
+                const cantidadDisponible = disponibles[moneda.tipo];
+                const valorMoneda = moneda.valor;
+                const cantidadNecesaria = Math.floor(cambioRestante / valorMoneda);
+
+                const cantidadReal = Math.min(cantidadNecesaria, cantidadDisponible);
+
+                if (cantidadReal > 0) {
+                    cambioDetallado[moneda.nombre] = cantidadReal;
+                    const valorEntregado = cantidadReal * valorMoneda;
+                    totalEntregado += valorEntregado;
+                    cambioRestante = (cambioRestante - valorEntregado).toFixed(2);
+
+                    // Actualizar cantidad de monedas
+                    const inputMoneda = document.getElementById(moneda.tipo);
+                    inputMoneda.value = cantidadDisponible - cantidadReal;
+                }
+            }
+
+            if (parseFloat(cambioRestante) > 0.005) {
+                resultadosDiv.innerHTML = "No hay suficientes monedas para dar el cambio completo";
+            } else {
+                let mensaje = "<h3>Cambio a Entregar:</h3>";
+                for (let [nombre, cantidad] of Object.entries(cambioDetallado)) {
+                    mensaje += `${nombre}: ${cantidad}<br>`;
+                }
+                
+                // Añadir total de cambio entregado
+                mensaje += `<div class="total-cambio">Total de Cambio: $${totalEntregado.toFixed(2)}</div>`;
+                
+                resultadosDiv.innerHTML = mensaje;
+                
+                // Actualizar monedas en caja
+                actualizarMonedas();
+            }
+        }
+
+        // Inicializar la caja al cargar la página
+        window.onload = inicializarCaja;
+    </script>
+</body>
+  </html>
