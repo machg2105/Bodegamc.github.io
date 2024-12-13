@@ -122,6 +122,27 @@
             monedas1c: 0
         };
 
+        // Cargar inventario guardado al iniciar la página
+        window.addEventListener('load', function() {
+            const inventarioGuardado = localStorage.getItem('inventario');
+            if (inventarioGuardado) {
+                inventario = JSON.parse(inventarioGuardado);
+                actualizarFormularioInventario();
+            }
+        });
+
+        function actualizarFormularioInventario() {
+            document.getElementById('billetes20').value = inventario.billetes20;
+            document.getElementById('billetes10').value = inventario.billetes10;
+            document.getElementById('billetes5').value = inventario.billetes5;
+            document.getElementById('monedas1').value = inventario.monedas1;
+            document.getElementById('monedas50c').value = inventario.monedas50c;
+            document.getElementById('monedas25c').value = inventario.monedas25c;
+            document.getElementById('monedas10c').value = inventario.monedas10c;
+            document.getElementById('monedas5c').value = inventario.monedas5c;
+            document.getElementById('monedas1c').value = inventario.monedas1c;
+        }
+
         document.getElementById('inventarioForm').addEventListener('submit', function(e) {
             e.preventDefault();
             inventario.billetes20 = parseInt(document.getElementById('billetes20').value);
@@ -133,6 +154,10 @@
             inventario.monedas10c = parseInt(document.getElementById('monedas10c').value);
             inventario.monedas5c = parseInt(document.getElementById('monedas5c').value);
             inventario.monedas1c = parseInt(document.getElementById('monedas1c').value);
+            
+            // Guardar inventario en localStorage
+            localStorage.setItem('inventario', JSON.stringify(inventario));
+            
             alert('Inventario guardado correctamente');
         });
 
@@ -220,6 +245,9 @@
                 return "Error: No hay suficiente cambio disponible";
             }
 
+            // Actualizar el inventario en localStorage después de dar cambio
+            localStorage.setItem('inventario', JSON.stringify(inventario));
+            
             return cambio;
         }
 
@@ -338,6 +366,9 @@
                 
                 resultadoDiv.innerHTML = mensaje;
             }
+            
+            // Actualizar el formulario de inventario después de dar cambio
+            actualizarFormularioInventario();
         }
     </script>
 </body>
